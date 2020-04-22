@@ -3,9 +3,15 @@ package com.example.demo.repository;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import com.example.demo.domain.Article;
@@ -23,6 +29,8 @@ public class ArticleRepository {
 
 	@Autowired
 	private NamedParameterJdbcTemplate template;
+
+	private SimpleJdbcInsert insert;
 
 	private static final ResultSetExtractor<List<Article>> ARTICLE_RESULT_SET_EXTRACTOR = (rs) -> {
 		List<Article> articleList = new ArrayList<>();
@@ -80,6 +88,30 @@ public class ArticleRepository {
 		}
 
 		return articleList;
+	}
+
+	@PostConstruct
+	public void init() {
+		SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert((JdbcTemplate) template.getJdbcOperations());
+		SimpleJdbcInsert withTableName = simpleJdbcInsert.withTableName("articles");
+		insert = withTableName.usingGeneratedKeyColumns("id");
+	}
+
+	/**
+	 * articlesテーブルに記事情報をインサートします.
+	 * 
+	 * @param article 記事オブジェクト
+	 * @return　ID自動採番された記事情報
+	 */
+	public Article insert(Article article) {
+		SqlParameterSource param = new BeanPropertySqlParameterSource(article);
+
+		if (article.getId() == null) {
+			Number key = insert.executeAndReturnKey(param);
+			article.setId(key.intValue());
+		}
+
+		return article;
 	}
 
 }
