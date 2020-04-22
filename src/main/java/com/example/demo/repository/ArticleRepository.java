@@ -31,24 +31,24 @@ public class ArticleRepository {
 		int articleIdToCheck = 0;
 
 		while (rs.next()) {
-			int currentArticleId = rs.getInt("id");
+			int currentArticleId = rs.getInt("article_id");
 
 			if (currentArticleId != articleIdToCheck) {
 				Article article = new Article();
-				article.setId(rs.getInt("id"));
-				article.setName(rs.getString("name"));
-				article.setContent(rs.getString("content"));
+				article.setId(rs.getInt("article_id"));
+				article.setName(rs.getString("article_name"));
+				article.setContent(rs.getString("article_content"));
 				article.setCommentList(commentList);
 				articleList.add(article);
 
 			}
 
-			if (rs.getInt("id") != 0) {
+			if (rs.getInt("comment_id") != 0) {
 				Comment comment = new Comment();
-				comment.setId(rs.getInt("id"));
-				comment.setName(rs.getString("name"));
-				comment.setContent(rs.getString("content"));
-				comment.setArticleId(rs.getInt("article_id"));
+				comment.setId(rs.getInt("comment_id"));
+				comment.setName(rs.getString("comment_name"));
+				comment.setContent(rs.getString("comment_content"));
+				comment.setArticleId(rs.getInt("comment_article_id"));
 				commentList.add(comment);
 
 			}
@@ -60,9 +60,26 @@ public class ArticleRepository {
 		return articleList;
 
 	};
-	
-	
-	
-	
+
+	/**
+	 * 記事とコメントを全件検索します.
+	 * 
+	 * @return 記事一覧情報
+	 */
+	public List<Article> findAll() {
+		StringBuilder sql = new StringBuilder();
+		sql.append(
+				"SELECT a.id article_id, a.name article_name, a.content article_content, c.id comment_id, c.name comment_name, c.content comment_content, c.article_id comment_article_id");
+		sql.append("FROM articles a RIGHT OUTER JOIN comments c on a.id = c.article_id ");
+		sql.append("WHERE a.id <= 50 ORDER BY a.id");
+
+		List<Article> articleList = template.query(sql.toString(), ARTICLE_RESULT_SET_EXTRACTOR);
+
+		if (articleList == null) {
+			return null;
+		}
+
+		return articleList;
+	}
 
 }
