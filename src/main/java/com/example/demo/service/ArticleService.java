@@ -37,7 +37,7 @@ public class ArticleService {
 	 * 記事を投稿します.
 	 * 
 	 * @param article 記事オブジェクト
-	 * @return　ID自動採番記事オブジェクト
+	 * @return ID自動採番記事オブジェクト
 	 */
 	public Article insert(Article article) {
 		return articleRepository.insert(article);
