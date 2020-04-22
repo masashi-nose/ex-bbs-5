@@ -77,9 +77,9 @@ public class ArticleRepository {
 	public List<Article> findAll() {
 		StringBuilder sql = new StringBuilder();
 		sql.append(
-				"SELECT a.id article_id, a.name article_name, a.content article_content, c.id comment_id, c.name comment_name, c.content comment_content, c.article_id comment_article_id");
-		sql.append("FROM articles a RIGHT OUTER JOIN comments c on a.id = c.article_id ");
-		sql.append("WHERE a.id <= 50 ORDER BY a.id");
+				"SELECT a.id article_id, a.name article_name, a.content article_content, c.id comment_id, c.name comment_name, c.content comment_content, c.article_id comment_article_id ");
+		sql.append("FROM articles a LEFT OUTER JOIN comments c on a.id = c.article_id ");
+		sql.append("ORDER BY a.id desc");
 
 		List<Article> articleList = template.query(sql.toString(), ARTICLE_RESULT_SET_EXTRACTOR);
 
